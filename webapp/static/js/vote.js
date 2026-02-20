@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
         banner.className = "voted-notice";
         banner.innerHTML =
             "<p><strong>&#10003; You voted for " + votedYear + ".</strong></p>" +
-            "<p class=\"voted-subtext\">You can still change your pick below, or go back and finalise all your votes.</p>";
+            "<p class=\"voted-subtext\">You can still change your pick below till the deadline.</p>";
 
         // Update buttons: current pick → disabled; other year → switch button
         document.querySelectorAll(".vote-btn").forEach(function (b) {
