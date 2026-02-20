@@ -308,6 +308,8 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
     gap: 0.8rem;
+    max-height: 62vh;
+    overflow-y: auto;
 }
 
 .game-tile {
