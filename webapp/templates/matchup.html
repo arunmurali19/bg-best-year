@@ -65,6 +65,56 @@
 </div>
 {% endif %}
 
+{# Head-to-head tier comparison bars (left year = blue, right year = red) #}
+{% set top25_l  = games_left|selectattr('rank', 'le', 25)|list|length %}
+{% set top200_l = games_left|selectattr('rank', 'le', 200)|list|length %}
+{% set total_l  = games_left|length %}
+{% set top25_r  = games_right|selectattr('rank', 'le', 25)|list|length %}
+{% set top200_r = games_right|selectattr('rank', 'le', 200)|list|length %}
+{% set total_r  = games_right|length %}
+<div class="tier-comparison">
+    <div class="tier-comparison-header">
+        <span class="tc-year-label">{{ left_year }}</span>
+        <span class="tc-year-label tc-year-right">{{ right_year }}</span>
+    </div>
+    {% set t25 = top25_l + top25_r %}
+    {% if t25 > 0 %}
+    <div class="tier-bar-row">
+        <span class="tier-bar-label rank-gold">★ Top 25</span>
+        <span class="tier-bar-count count-left">{{ top25_l }}</span>
+        <div class="tier-bar">
+            <div class="tier-fill fill-left" style="width: {{ (top25_l / t25 * 100)|round(1) }}%"></div>
+            <div class="tier-fill fill-right" style="width: {{ (top25_r / t25 * 100)|round(1) }}%"></div>
+        </div>
+        <span class="tier-bar-count count-right">{{ top25_r }}</span>
+    </div>
+    {% endif %}
+    {% set t200 = top200_l + top200_r %}
+    {% if t200 > 0 %}
+    <div class="tier-bar-row">
+        <span class="tier-bar-label rank-silver">● Top 200</span>
+        <span class="tier-bar-count count-left">{{ top200_l }}</span>
+        <div class="tier-bar">
+            <div class="tier-fill fill-left" style="width: {{ (top200_l / t200 * 100)|round(1) }}%"></div>
+            <div class="tier-fill fill-right" style="width: {{ (top200_r / t200 * 100)|round(1) }}%"></div>
+        </div>
+        <span class="tier-bar-count count-right">{{ top200_r }}</span>
+    </div>
+    {% endif %}
+    {% set ttot = total_l + total_r %}
+    {% if ttot > 0 %}
+    <div class="tier-bar-row">
+        <span class="tier-bar-label rank-bronze">▲ Top 1000</span>
+        <span class="tier-bar-count count-left">{{ total_l }}</span>
+        <div class="tier-bar">
+            <div class="tier-fill fill-left" style="width: {{ (total_l / ttot * 100)|round(1) }}%"></div>
+            <div class="tier-fill fill-right" style="width: {{ (total_r / ttot * 100)|round(1) }}%"></div>
+        </div>
+        <span class="tier-bar-count count-right">{{ total_r }}</span>
+    </div>
+    {% endif %}
+</div>
+
 <div class="matchup-columns" id="matchup-columns" data-flip="{{ 'true' if flip else 'false' }}">
     {# Left column #}
     <div class="year-column {% if user_voted == left_year %}selected{% endif %}">
@@ -88,13 +138,6 @@
                 {% endif %}
             {% endif %}
         </div>
-        {% set top25_left = games_left|selectattr('rank', 'le', 25)|list|length %}
-        {% set top200_left = games_left|selectattr('rank', 'le', 200)|list|length %}
-        <p class="game-count">
-            <span class="rank-gold">{{ top25_left }} in top 25</span> &middot;
-            <span class="rank-silver">{{ top200_left }} in top 200</span> &middot;
-            <span class="rank-bronze">{{ games_left|length }} in top 1000</span>
-        </p>
         <div class="game-grid">
             {% for g in games_left %}
             <a href="https://boardgamegeek.com/boardgame/{{ g.game_id }}" target="_blank" class="game-tile">
@@ -134,13 +177,6 @@
                 {% endif %}
             {% endif %}
         </div>
-        {% set top25_right = games_right|selectattr('rank', 'le', 25)|list|length %}
-        {% set top200_right = games_right|selectattr('rank', 'le', 200)|list|length %}
-        <p class="game-count">
-            <span class="rank-gold">{{ top25_right }} in top 25</span> &middot;
-            <span class="rank-silver">{{ top200_right }} in top 200</span> &middot;
-            <span class="rank-bronze">{{ games_right|length }} in top 1000</span>
-        </p>
         <div class="game-grid">
             {% for g in games_right %}
             <a href="https://boardgamegeek.com/boardgame/{{ g.game_id }}" target="_blank" class="game-tile">

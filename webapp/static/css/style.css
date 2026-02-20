@@ -206,11 +206,78 @@
     margin-bottom: 0.5rem;
 }
 
-.game-count {
-    text-align: center;
-    opacity: 0.6;
-    margin-bottom: 1rem;
+/* Tier comparison bars (matchup page) */
+.tier-comparison {
+    margin: 0 0 2rem;
+    padding: 1rem 1.2rem;
+    background: #f8f9fa;
+    border-radius: 8px;
 }
+
+.tier-comparison-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    opacity: 0.55;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tc-year-label {
+    color: var(--bar-a);
+}
+
+.tc-year-right {
+    color: var(--bar-b);
+}
+
+.tier-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.45rem;
+}
+
+.tier-bar-label {
+    min-width: 90px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.tier-bar-count {
+    font-size: 0.9rem;
+    font-weight: 800;
+    min-width: 24px;
+}
+
+.count-left {
+    text-align: right;
+    color: var(--bar-a);
+}
+
+.count-right {
+    text-align: left;
+    color: var(--bar-b);
+}
+
+.tier-bar {
+    flex: 1;
+    height: 16px;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    background: #e0e0e0;
+}
+
+.tier-fill {
+    height: 100%;
+    transition: width 0.4s ease;
+}
+
+.fill-left  { background: var(--bar-a); }
+.fill-right { background: var(--bar-b); }
 
 .vote-btn {
     width: 100%;
