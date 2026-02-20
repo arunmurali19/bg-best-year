@@ -12,13 +12,27 @@
 {% else %}
 <hgroup>
     <h1>{{ round_name }}</h1>
+    {% if voter_finalized %}
+    <p>Your votes are locked in. Results will be revealed after the round ends.</p>
+    {% elif all_voted %}
+    <p>Results will be revealed after the round ends.</p>
+    {% else %}
     <p>Which year produced the best board games? Pick one from each matchup.</p>
+    {% endif %}
 </hgroup>
 
 {% if voting_deadline %}
 <div class="deadline-timer" id="deadline-timer" data-deadline="{{ voting_deadline }}">
     <span id="timer-text">Loading countdown...</span>
 </div>
+{% endif %}
+
+{% if any_voted and not voter_finalized and not winner %}
+<form action="/finalize" method="post" class="finalise-form">
+    <button type="submit" class="finalise-btn">Finalise All Votes</button>
+</form>
+{% elif voter_finalized and not winner %}
+<p class="finalised-notice">&#10003; Your votes are finalised</p>
 {% endif %}
 
 {% if matchups %}

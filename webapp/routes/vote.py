@@ -1,6 +1,6 @@
 """Voting routes: landing page, matchup detail, vote submission."""
 
-from flask import Blueprint, render_template, request, jsonify, make_response
+from flask import Blueprint, render_template, request, jsonify, make_response, redirect, url_for
 from webapp.services import tournament, voting
 
 vote_bp = Blueprint("vote", __name__)
@@ -16,9 +16,16 @@ def index():
     deadline = tournament.get_voting_deadline()
 
     voter_id = voting.get_or_create_voter_id()
+    voter_finalized = voting.is_voter_finalized(voter_id)
 
+    any_voted = False
+    all_voted = bool(matchups)
     for m in matchups:
         m["user_voted"] = voting.has_voted(m["match_id"], voter_id)
+        if m["user_voted"]:
+            any_voted = True
+        else:
+            all_voted = False
         if m["user_voted"] and revealed:
             m["results"] = voting.get_match_results(m["match_id"])
 
@@ -29,6 +36,9 @@ def index():
         round_name=round_name,
         winner=winner,
         voting_deadline=deadline,
+        voter_finalized=voter_finalized,
+        any_voted=any_voted,
+        all_voted=all_voted,
     ))
     resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax", secure=True)
     return resp
@@ -45,6 +55,7 @@ def matchup(match_id):
 
     voter_id = voting.get_or_create_voter_id()
     user_voted = voting.has_voted(match_id, voter_id)
+    voter_finalized = voting.is_voter_finalized(voter_id)
     revealed = tournament.is_results_revealed(match["round"])
     results = voting.get_match_results(match_id) if revealed and (user_voted or match["winner"]) else None
 
@@ -60,6 +71,7 @@ def matchup(match_id):
         games_a=games_a,
         games_b=games_b,
         user_voted=user_voted,
+        voter_finalized=voter_finalized,
         results=results,
         revealed=revealed,
         round_name=round_name,
@@ -80,6 +92,15 @@ def submit_vote(match_id):
     result = voting.cast_vote(match_id, int(data["year"]), voter_id)
 
     resp = jsonify(result)
+    resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax", secure=True)
+    return resp
+
+
+@vote_bp.route("/finalize", methods=["POST"])
+def finalize_votes():
+    voter_id = voting.get_or_create_voter_id()
+    voting.finalize_voter(voter_id)
+    resp = make_response(redirect(url_for("vote.index")))
     resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax", secure=True)
     return resp
 

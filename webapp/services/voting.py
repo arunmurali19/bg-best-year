@@ -1,6 +1,7 @@
-"""Voting logic: cast votes, check status, get results."""
+"""Voting logic: cast votes, check finalization, get results."""
 
 import uuid
+from datetime import datetime
 from flask import request
 from webapp.database import get_db
 
@@ -13,11 +14,40 @@ def get_or_create_voter_id():
     return voter_id
 
 
+def is_voter_finalized(voter_id: str) -> bool:
+    """True if voter explicitly finalised OR the voting deadline has passed."""
+    db = get_db()
+    row = db.execute(
+        "SELECT 1 FROM voter_finalizations WHERE voter_id = ?", (voter_id,)
+    ).fetchone()
+    if row:
+        return True
+    # Check if deadline has passed
+    dl = db.execute(
+        "SELECT value FROM tournament_state WHERE key = 'voting_deadline'"
+    ).fetchone()
+    if dl and dl["value"].strip():
+        try:
+            if datetime.now() > datetime.fromisoformat(dl["value"].strip()):
+                return True
+        except Exception:
+            pass
+    return False
+
+
+def finalize_voter(voter_id: str):
+    """Lock in this voter's picks — they can no longer change votes."""
+    db = get_db()
+    db.execute(
+        "INSERT OR IGNORE INTO voter_finalizations (voter_id) VALUES (?)", (voter_id,)
+    )
+    db.commit()
+
+
 def cast_vote(match_id: int, voted_for: int, voter_id: str) -> dict:
-    """Cast a vote. Returns success status and current results."""
+    """Cast or change a vote. Rejected if voter is finalised or match inactive."""
     db = get_db()
 
-    # Verify match is active
     match = db.execute(
         "SELECT * FROM matches WHERE match_id = ? AND is_active = 1 AND winner IS NULL",
         (match_id,)
@@ -25,26 +55,21 @@ def cast_vote(match_id: int, voted_for: int, voter_id: str) -> dict:
     if not match:
         return {"success": False, "error": "Match is not active"}
 
-    # Verify voted_for is one of the two years in the match
+    if is_voter_finalized(voter_id):
+        return {"success": False, "error": "Your votes are finalised"}
+
     if voted_for not in (match["year_a"], match["year_b"]):
         return {"success": False, "error": "Invalid year for this match"}
 
-    # Try to insert (UNIQUE constraint on match_id, voter_id prevents duplicates)
-    cursor = db.execute(
-        "INSERT OR IGNORE INTO votes (match_id, voted_for, voter_id, ip_address) "
+    # INSERT OR REPLACE allows changing a previous vote
+    db.execute(
+        "INSERT OR REPLACE INTO votes (match_id, voted_for, voter_id, ip_address) "
         "VALUES (?, ?, ?, ?)",
         (match_id, voted_for, voter_id, request.remote_addr),
     )
     db.commit()
 
-    already_voted = cursor.rowcount == 0
-    results = get_match_results(match_id)
-
-    return {
-        "success": not already_voted,
-        "already_voted": already_voted,
-        "results": results,
-    }
+    return {"success": True, "voted_for": voted_for}
 
 
 def get_match_results(match_id: int) -> dict:
@@ -77,8 +102,8 @@ def get_match_results(match_id: int) -> dict:
     }
 
 
-def has_voted(match_id: int, voter_id: str) -> int | None:
-    """Check if voter already voted on this match. Returns voted_for year or None."""
+def has_voted(match_id: int, voter_id: str):
+    """Returns the year the voter chose for this match, or None."""
     db = get_db()
     row = db.execute(
         "SELECT voted_for FROM votes WHERE match_id = ? AND voter_id = ?",

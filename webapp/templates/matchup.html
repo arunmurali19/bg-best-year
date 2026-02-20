@@ -55,8 +55,13 @@
 </div>
 {% elif user_voted and not match.winner %}
 <div class="voted-notice" id="results-banner">
-    <p><strong>&#10003; You have already voted on this matchup.</strong></p>
+    {% if voter_finalized %}
+    <p><strong>&#10003; Your vote is locked in.</strong></p>
     <p class="voted-subtext">Results will be revealed by the admin after the round ends.</p>
+    {% else %}
+    <p><strong>&#10003; You voted for {{ user_voted }}.</strong></p>
+    <p class="voted-subtext">You can still change your pick below, or go back and finalise all your votes.</p>
+    {% endif %}
 </div>
 {% endif %}
 
@@ -65,12 +70,22 @@
     <div class="year-column {% if user_voted == left_year %}selected{% endif %}">
         <div class="year-header">
             <h3>{{ left_year }}</h3>
-            {% if match.is_active and not match.winner and not user_voted %}
-            <button class="vote-btn" data-year="{{ left_year }}" data-match="{{ match.match_id }}">
-                Vote for {{ left_year }}
-            </button>
-            {% elif user_voted == left_year %}
-            <mark>Your vote</mark>
+            {% if match.is_active and not match.winner %}
+                {% if not user_voted %}
+                <button class="vote-btn" data-year="{{ left_year }}" data-match="{{ match.match_id }}">
+                    Vote for {{ left_year }}
+                </button>
+                {% elif user_voted == left_year and not voter_finalized %}
+                <button class="vote-btn current-pick" disabled data-year="{{ left_year }}" data-match="{{ match.match_id }}">
+                    &#10003; Current pick
+                </button>
+                {% elif user_voted == left_year and voter_finalized %}
+                <mark>Your vote</mark>
+                {% elif user_voted == right_year and not voter_finalized %}
+                <button class="vote-btn switch-btn" data-year="{{ left_year }}" data-match="{{ match.match_id }}">
+                    Switch to {{ left_year }}
+                </button>
+                {% endif %}
             {% endif %}
         </div>
         {% set top25_left = games_left|selectattr('rank', 'le', 25)|list|length %}
@@ -101,12 +116,22 @@
     <div class="year-column {% if user_voted == right_year %}selected{% endif %}">
         <div class="year-header">
             <h3>{{ right_year }}</h3>
-            {% if match.is_active and not match.winner and not user_voted %}
-            <button class="vote-btn" data-year="{{ right_year }}" data-match="{{ match.match_id }}">
-                Vote for {{ right_year }}
-            </button>
-            {% elif user_voted == right_year %}
-            <mark>Your vote</mark>
+            {% if match.is_active and not match.winner %}
+                {% if not user_voted %}
+                <button class="vote-btn" data-year="{{ right_year }}" data-match="{{ match.match_id }}">
+                    Vote for {{ right_year }}
+                </button>
+                {% elif user_voted == right_year and not voter_finalized %}
+                <button class="vote-btn current-pick" disabled data-year="{{ right_year }}" data-match="{{ match.match_id }}">
+                    &#10003; Current pick
+                </button>
+                {% elif user_voted == right_year and voter_finalized %}
+                <mark>Your vote</mark>
+                {% elif user_voted == left_year and not voter_finalized %}
+                <button class="vote-btn switch-btn" data-year="{{ right_year }}" data-match="{{ match.match_id }}">
+                    Switch to {{ right_year }}
+                </button>
+                {% endif %}
             {% endif %}
         </div>
         {% set top25_right = games_right|selectattr('rank', 'le', 25)|list|length %}

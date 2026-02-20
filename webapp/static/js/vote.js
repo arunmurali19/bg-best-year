@@ -1,40 +1,48 @@
 document.addEventListener("DOMContentLoaded", function () {
-    const buttons = document.querySelectorAll(".vote-btn");
-    const flip = document.getElementById("matchup-columns")?.dataset.flip === "true";
+    document.getElementById("matchup-columns");
 
-    buttons.forEach(function (btn) {
-        btn.addEventListener("click", function () {
-            const matchId = btn.dataset.match;
-            const year = btn.dataset.year;
-
-            // Disable all vote buttons immediately
-            buttons.forEach(function (b) {
-                b.disabled = true;
-                b.textContent = "Voting...";
-            });
-
-            fetch("/matchup/" + matchId + "/vote", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ year: parseInt(year) }),
-            })
-                .then(function (resp) { return resp.json(); })
-                .then(function (data) {
-                    // Show thank-you notice — results are revealed by admin later
-                    showThankYou(parseInt(year));
-                })
-                .catch(function (err) {
-                    console.error("Vote failed:", err);
-                    buttons.forEach(function (b) {
-                        b.disabled = false;
-                        b.textContent = "Vote for " + b.dataset.year;
-                    });
-                });
+    // Attach listeners to all vote buttons (including switch-btn)
+    function attachListeners() {
+        document.querySelectorAll(".vote-btn:not([disabled])").forEach(function (btn) {
+            btn.addEventListener("click", handleVote);
         });
-    });
+    }
 
-    function showThankYou(votedYear) {
-        // Replace or create the banner with a thank-you message
+    function handleVote() {
+        var btn = this;
+        var matchId = btn.dataset.match;
+        var year = parseInt(btn.dataset.year);
+
+        // Disable all buttons while request is in flight
+        document.querySelectorAll(".vote-btn").forEach(function (b) {
+            b.disabled = true;
+        });
+
+        fetch("/matchup/" + matchId + "/vote", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ year: year }),
+        })
+            .then(function (resp) { return resp.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    showVotedState(data.voted_for);
+                } else {
+                    // Re-enable on error
+                    document.querySelectorAll(".vote-btn").forEach(function (b) {
+                        b.disabled = false;
+                    });
+                }
+            })
+            .catch(function () {
+                document.querySelectorAll(".vote-btn").forEach(function (b) {
+                    b.disabled = false;
+                });
+            });
+    }
+
+    function showVotedState(votedYear) {
+        // Update banner
         var banner = document.getElementById("results-banner");
         if (!banner) {
             banner = document.createElement("div");
@@ -44,18 +52,27 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         banner.className = "voted-notice";
         banner.innerHTML =
-            "<p><strong>&#10003; Thank you for voting!</strong></p>" +
-            "<p class=\"voted-subtext\">Results will be revealed by the admin after the round ends.</p>";
+            "<p><strong>&#10003; You voted for " + votedYear + ".</strong></p>" +
+            "<p class=\"voted-subtext\">You can still change your pick below, or go back and finalise all your votes.</p>";
 
-        // Update columns: mark the voted year, remove the other button
-        buttons.forEach(function (b) {
-            if (parseInt(b.dataset.year) === votedYear) {
-                b.closest(".year-column").classList.add("selected");
+        // Update buttons: current pick → disabled; other year → switch button
+        document.querySelectorAll(".vote-btn").forEach(function (b) {
+            var bYear = parseInt(b.dataset.year);
+            if (bYear === votedYear) {
+                b.className = "vote-btn current-pick";
                 b.disabled = true;
-                b.textContent = "Voted!";
+                b.textContent = "\u2713 Current pick";
+                b.closest(".year-column").classList.add("selected");
             } else {
-                b.remove();
+                b.className = "vote-btn switch-btn";
+                b.disabled = false;
+                b.textContent = "Switch to " + bYear;
+                b.closest(".year-column").classList.remove("selected");
+                b.removeEventListener("click", handleVote);
+                b.addEventListener("click", handleVote);
             }
         });
     }
+
+    attachListeners();
 });

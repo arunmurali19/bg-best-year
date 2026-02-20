@@ -573,6 +573,56 @@
     font-size: 0.9rem;
 }
 
+/* Current pick (disabled, voted) button */
+.vote-btn.current-pick {
+    opacity: 0.55;
+    cursor: not-allowed;
+    background: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+/* Switch-to button (active vote change) */
+.vote-btn.switch-btn {
+    background: transparent;
+    border: 2px solid var(--accent);
+    color: var(--accent);
+}
+
+.vote-btn.switch-btn:hover {
+    background: var(--accent);
+    color: white;
+}
+
+/* Finalise All Votes button + form */
+.finalise-form {
+    margin: 1rem 0 1.5rem;
+    text-align: center;
+}
+
+.finalise-btn {
+    background: #28a745;
+    border-color: #28a745;
+    color: white;
+    padding: 0.6rem 2rem;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 6px;
+}
+
+.finalise-btn:hover {
+    background: #218838;
+    border-color: #1e7e34;
+}
+
+/* Finalised confirmation notice */
+.finalised-notice {
+    text-align: center;
+    color: #28a745;
+    font-weight: 600;
+    margin: 0.5rem 0 1.5rem;
+}
+
 /* Champion banner */
 .champion-banner {
     text-align: center;

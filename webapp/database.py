@@ -46,6 +46,11 @@ CREATE TABLE IF NOT EXISTS tournament_state (
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS voter_finalizations (
+    voter_id TEXT PRIMARY KEY,
+    finalized_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
 """
 
 
@@ -74,3 +79,5 @@ def init_db():
 
 def init_app(app):
     app.teardown_appcontext(close_db)
+    with app.app_context():
+        init_db()
