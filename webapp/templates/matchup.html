@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ match.year_a }} vs {{ match.year_b }} - Board Game Best Year{% endblock %}
+{% block title %}{{ match.year_a }} vs {{ match.year_b }} - What's the Good Year?{% endblock %}
 
 {% block content %}
 <p><a href="/">&larr; Back to all matchups</a></p>
@@ -20,6 +20,14 @@
 
 <h2 class="matchup-title">{{ round_name }}: {{ left_year }} vs {{ right_year }}</h2>
 
+{# Countdown timer (only for active, unfinished matches with a deadline set) #}
+{% if voting_deadline and match.is_active and not match.winner %}
+<div class="deadline-timer" id="deadline-timer" data-deadline="{{ voting_deadline }}">
+    <span id="timer-text">Loading countdown...</span>
+</div>
+{% endif %}
+
+{# Status banner: results (if revealed), already-voted notice (if not revealed) #}
 {% if results %}
 {% if flip %}
 {% set left_pct = results.pct_b %}
@@ -44,6 +52,11 @@
         </div>
     </div>
     <p class="vote-count">{{ results.total }} total vote{{ 's' if results.total != 1 }}</p>
+</div>
+{% elif user_voted and not match.winner %}
+<div class="voted-notice" id="results-banner">
+    <p><strong>&#10003; You have already voted on this matchup.</strong></p>
+    <p class="voted-subtext">Results will be revealed by the admin after the round ends.</p>
 </div>
 {% endif %}
 
@@ -122,4 +135,30 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/vote.js') }}"></script>
+<script>
+(function () {
+    var el = document.getElementById("deadline-timer");
+    if (!el) return;
+    var deadline = new Date(el.dataset.deadline);
+    function update() {
+        var diff = deadline - new Date();
+        if (diff <= 0) {
+            document.getElementById("timer-text").textContent = "Voting is now closed.";
+            return;
+        }
+        var days  = Math.floor(diff / 86400000);
+        var hours = Math.floor((diff % 86400000) / 3600000);
+        var mins  = Math.floor((diff % 3600000) / 60000);
+        var secs  = Math.floor((diff % 60000) / 1000);
+        var parts = [];
+        if (days > 0) parts.push(days + "d");
+        parts.push(String(hours).padStart(2, "0") + "h");
+        parts.push(String(mins).padStart(2, "0") + "m");
+        parts.push(String(secs).padStart(2, "0") + "s");
+        document.getElementById("timer-text").textContent = "Voting closes in " + parts.join(" ");
+        setTimeout(update, 1000);
+    }
+    update();
+}());
+</script>
 {% endblock %}

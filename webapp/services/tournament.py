@@ -206,3 +206,56 @@ def get_tournament_winner():
         "SELECT * FROM matches WHERE next_match_id IS NULL AND winner IS NOT NULL"
     ).fetchone()
     return dict(final) if final else None
+
+
+import json as _json
+
+
+def is_results_revealed(round_num: int) -> bool:
+    db = get_db()
+    row = db.execute(
+        "SELECT value FROM tournament_state WHERE key = 'results_revealed'"
+    ).fetchone()
+    if not row:
+        return False
+    try:
+        return round_num in _json.loads(row["value"])
+    except Exception:
+        return False
+
+
+def reveal_results_for_round(round_num: int):
+    db = get_db()
+    row = db.execute(
+        "SELECT value FROM tournament_state WHERE key = 'results_revealed'"
+    ).fetchone()
+    try:
+        revealed = _json.loads(row["value"]) if row else []
+    except Exception:
+        revealed = []
+    if round_num not in revealed:
+        revealed.append(round_num)
+    db.execute(
+        "INSERT OR REPLACE INTO tournament_state (key, value) VALUES ('results_revealed', ?)",
+        (_json.dumps(revealed),)
+    )
+    db.commit()
+
+
+def get_voting_deadline() -> str | None:
+    db = get_db()
+    row = db.execute(
+        "SELECT value FROM tournament_state WHERE key = 'voting_deadline'"
+    ).fetchone()
+    if not row or not row["value"].strip():
+        return None
+    return row["value"].strip()
+
+
+def set_voting_deadline(deadline_str: str):
+    db = get_db()
+    db.execute(
+        "INSERT OR REPLACE INTO tournament_state (key, value) VALUES ('voting_deadline', ?)",
+        (deadline_str,)
+    )
+    db.commit()

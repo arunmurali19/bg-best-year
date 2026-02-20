@@ -12,13 +12,14 @@ def index():
     round_name = tournament.get_round_name(current_round)
     matchups = tournament.get_active_matchups()
     winner = tournament.get_tournament_winner()
+    revealed = tournament.is_results_revealed(current_round)
+    deadline = tournament.get_voting_deadline()
 
     voter_id = voting.get_or_create_voter_id()
 
-    # Check which matchups the user already voted on
     for m in matchups:
         m["user_voted"] = voting.has_voted(m["match_id"], voter_id)
-        if m["user_voted"]:
+        if m["user_voted"] and revealed:
             m["results"] = voting.get_match_results(m["match_id"])
 
     resp = make_response(render_template(
@@ -27,6 +28,7 @@ def index():
         current_round=current_round,
         round_name=round_name,
         winner=winner,
+        voting_deadline=deadline,
     ))
     resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax")
     return resp
@@ -43,12 +45,14 @@ def matchup(match_id):
 
     voter_id = voting.get_or_create_voter_id()
     user_voted = voting.has_voted(match_id, voter_id)
-    results = voting.get_match_results(match_id) if user_voted or match["winner"] else None
+    revealed = tournament.is_results_revealed(match["round"])
+    results = voting.get_match_results(match_id) if revealed and (user_voted or match["winner"]) else None
 
     round_name = tournament.get_round_name(match["round"])
     # Flip only Round 1 (same rule as bracket): odd match_ids show year_b on left.
     # Rounds 2+ never flip so winners stay in the position they earned.
     flip = match["round"] == 1 and match["match_id"] % 2 != 0
+    deadline = tournament.get_voting_deadline()
 
     resp = make_response(render_template(
         "matchup.html",
@@ -57,8 +61,10 @@ def matchup(match_id):
         games_b=games_b,
         user_voted=user_voted,
         results=results,
+        revealed=revealed,
         round_name=round_name,
         flip=flip,
+        voting_deadline=deadline,
     ))
     resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax")
     return resp
@@ -83,10 +89,12 @@ def results():
     current_round = tournament.get_current_round()
     completed = tournament.get_completed_matches()
 
-    # Group by round
+    # Only show rounds where admin has revealed results
     rounds = {}
     for m in completed:
         r = m["round"]
+        if not tournament.is_results_revealed(r):
+            continue
         if r not in rounds:
             rounds[r] = {"name": tournament.get_round_name(r), "matches": []}
         rounds[r]["matches"].append(m)

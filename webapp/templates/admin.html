@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Admin - Board Game Best Year{% endblock %}
+{% block title %}Admin - What's the Good Year?{% endblock %}
 
 {% block content %}
 <h1>Admin Dashboard</h1>
@@ -69,33 +69,71 @@
 </article>
 {% endif %}
 
-{% if completed %}
+{# ── Completed Rounds with Reveal Controls ── #}
+{% if completed_by_round %}
 <article>
-    <h3>Completed Matches</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Round</th>
-                <th>Year A</th>
-                <th>Year B</th>
-                <th>Votes</th>
-                <th>Winner</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for m in completed %}
-            <tr>
-                <td>{{ m.round }}</td>
-                <td>{{ m.year_a }} <small>(#{{ year_seeds.get(m.year_a, '?') }})</small></td>
-                <td>{{ m.year_b }} <small>(#{{ year_seeds.get(m.year_b, '?') }})</small></td>
-                <td>{{ m.votes_a }} - {{ m.votes_b }}</td>
-                <td><strong>{{ m.winner }}</strong></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h3>Completed Rounds</h3>
+    {% for round_num in completed_by_round.keys()|sort %}
+    {% set rd = completed_by_round[round_num] %}
+    <details open>
+        <summary style="display:flex; align-items:center; gap:1rem; padding:0.5rem 0;">
+            <strong>{{ rd.name }}</strong>
+            {% if rd.revealed %}
+            <span class="reveal-badge">&#10003; Results Revealed</span>
+            {% else %}
+            <form method="POST" action="/admin/{{ secret }}/reveal/{{ round_num }}" style="margin:0">
+                <button type="submit" class="outline" style="margin:0; padding:0.3rem 0.8rem; font-size:0.85rem;">
+                    Reveal Results
+                </button>
+            </form>
+            {% endif %}
+        </summary>
+        <table>
+            <thead>
+                <tr>
+                    <th>Year A</th>
+                    <th>Year B</th>
+                    <th>Votes A</th>
+                    <th>Votes B</th>
+                    <th>Winner</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for m in rd.matches %}
+                <tr>
+                    <td>{{ m.year_a }} <small>(#{{ year_seeds.get(m.year_a, '?') }})</small></td>
+                    <td>{{ m.year_b }} <small>(#{{ year_seeds.get(m.year_b, '?') }})</small></td>
+                    <td>{{ m.votes_a }}</td>
+                    <td>{{ m.votes_b }}</td>
+                    <td><strong>{{ m.winner }}</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </details>
+    {% endfor %}
 </article>
 {% endif %}
+
+{# ── Voting Deadline ── #}
+<article>
+    <h3>Voting Deadline</h3>
+    {% if deadline %}
+    <p>Current deadline: <strong>{{ deadline }}</strong></p>
+    {% else %}
+    <p><small>No deadline set — no countdown timer will be shown to players.</small></p>
+    {% endif %}
+    <form method="POST" action="/admin/{{ secret }}/set_deadline">
+        <label>
+            New deadline (your local date &amp; time)
+            <input type="datetime-local" name="deadline" value="{{ deadline }}">
+        </label>
+        <div style="display:flex; gap:1rem; margin-top:0.8rem;">
+            <button type="submit">Save Deadline</button>
+            <button type="submit" name="deadline" value="" class="outline secondary">Clear Deadline</button>
+        </div>
+    </form>
+</article>
 
 <article>
     <h3>Danger Zone</h3>

@@ -1,7 +1,7 @@
 [project]
 name = "bg-best-year"
 version = "1.0.0"
-description = "Board Game Best Year Knockout Tournament"
+description = "What's the Good Year? Board Game Knockout Tournament"
 requires-python = ">=3.10"
 dependencies = [
     "flask>=3.0",

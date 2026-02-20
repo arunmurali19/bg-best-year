@@ -1,4 +1,4 @@
-/* Board Game Best Year - Custom Styles */
+/* What's the Good Year? - Custom Styles */
 
 :root {
     --accent: #e67e22;
@@ -525,6 +525,52 @@
 .result-year small {
     display: block;
     opacity: 0.6;
+}
+
+/* Voting deadline countdown timer */
+.deadline-timer {
+    text-align: center;
+    padding: 0.55rem 1rem;
+    background: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+/* Thank you / already-voted notice */
+.voted-notice {
+    text-align: center;
+    padding: 1.2rem 1.5rem;
+    background: #d4edda;
+    border: 1px solid #28a745;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.voted-notice p {
+    margin: 0.25rem 0;
+}
+
+.voted-subtext {
+    opacity: 0.75;
+    font-size: 0.9rem;
+}
+
+/* Voted indicator on index cards */
+.voted-indicator {
+    display: block;
+    margin-top: 0.5rem;
+    color: #28a745;
+    font-weight: 600;
+}
+
+/* Reveal badge in admin */
+.reveal-badge {
+    color: #28a745;
+    font-weight: 600;
+    font-size: 0.9rem;
 }
 
 /* Champion banner */

@@ -1,19 +1,25 @@
 {% extends "base.html" %}
 
-{% block title %}Vote - Board Game Best Year{% endblock %}
+{% block title %}Vote - What's the Good Year?{% endblock %}
 
 {% block content %}
 {% if winner %}
 <article class="champion-banner">
     <h1>Champion: {{ winner.winner }}</h1>
-    <p>The tournament is complete! <strong>{{ winner.winner }}</strong> has been crowned the best year for board games.</p>
-    <p><a href="/bracket">View the full bracket</a> | <a href="/results">View all results</a></p>
+    <p>The tournament is complete! <strong>{{ winner.winner }}</strong> is the Good Year for board games!</p>
+    <p><a href="/bracket">View the full bracket</a></p>
 </article>
 {% else %}
 <hgroup>
     <h1>{{ round_name }}</h1>
-    <p>Vote for the best year in board gaming! Pick one year from each matchup.</p>
+    <p>Which year produced the best board games? Pick one from each matchup.</p>
 </hgroup>
+
+{% if voting_deadline %}
+<div class="deadline-timer" id="deadline-timer" data-deadline="{{ voting_deadline }}">
+    <span id="timer-text">Loading countdown...</span>
+</div>
+{% endif %}
 
 {% if matchups %}
 <div class="matchup-grid">
@@ -27,11 +33,15 @@
             </div>
             {% if m.user_voted %}
             <div class="vote-status">
+                {% if m.results %}
                 <small>You voted for {{ m.user_voted }}</small>
                 <div class="result-bar-mini">
                     <div class="bar-a" style="width: {{ m.results.pct_a }}%"></div>
                 </div>
                 <small>{{ m.results.votes_a }} - {{ m.results.votes_b }}</small>
+                {% else %}
+                <small class="voted-indicator">&#10003; Voted</small>
+                {% endif %}
             </div>
             {% else %}
             <small class="vote-cta">Click to vote</small>
@@ -44,4 +54,33 @@
 <p>No active matchups right now. Check back later!</p>
 {% endif %}
 {% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+(function () {
+    var el = document.getElementById("deadline-timer");
+    if (!el) return;
+    var deadline = new Date(el.dataset.deadline);
+    function update() {
+        var diff = deadline - new Date();
+        if (diff <= 0) {
+            document.getElementById("timer-text").textContent = "Voting is now closed.";
+            return;
+        }
+        var days  = Math.floor(diff / 86400000);
+        var hours = Math.floor((diff % 86400000) / 3600000);
+        var mins  = Math.floor((diff % 3600000) / 60000);
+        var secs  = Math.floor((diff % 60000) / 1000);
+        var parts = [];
+        if (days > 0) parts.push(days + "d");
+        parts.push(String(hours).padStart(2, "0") + "h");
+        parts.push(String(mins).padStart(2, "0") + "m");
+        parts.push(String(secs).padStart(2, "0") + "s");
+        document.getElementById("timer-text").textContent = "Voting closes in " + parts.join(" ");
+        setTimeout(update, 1000);
+    }
+    update();
+}());
+</script>
 {% endblock %}

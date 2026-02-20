@@ -20,18 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
             })
                 .then(function (resp) { return resp.json(); })
                 .then(function (data) {
-                    if (data.results) {
-                        showResults(data.results, parseInt(year), flip);
-                    }
-                    // Update buttons
-                    buttons.forEach(function (b) {
-                        if (b.dataset.year === year) {
-                            b.textContent = "Voted!";
-                            b.closest(".year-column").classList.add("selected");
-                        } else {
-                            b.remove();
-                        }
-                    });
+                    // Show thank-you notice — results are revealed by admin later
+                    showThankYou(parseInt(year));
                 })
                 .catch(function (err) {
                     console.error("Vote failed:", err);
@@ -43,37 +33,29 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
-    function showResults(results, votedYear, flipped) {
-        // If the display is flipped, year_b is shown on the left (bar-a)
-        var leftYear  = flipped ? results.year_b : results.year_a;
-        var leftPct   = flipped ? results.pct_b  : results.pct_a;
-        var rightYear = flipped ? results.year_a  : results.year_b;
-        var rightPct  = flipped ? results.pct_a   : results.pct_b;
-
+    function showThankYou(votedYear) {
+        // Replace or create the banner with a thank-you message
         var banner = document.getElementById("results-banner");
         if (!banner) {
             banner = document.createElement("div");
             banner.id = "results-banner";
-            banner.className = "results-banner";
             var title = document.querySelector(".matchup-title");
             title.parentNode.insertBefore(banner, title.nextSibling);
         }
+        banner.className = "voted-notice";
         banner.innerHTML =
-            '<div class="result-row">' +
-            '<div class="result-side-label">' +
-            "<strong>" + leftYear + "</strong>" +
-            "<span>" + leftPct + "%</span>" +
-            "</div>" +
-            '<div class="result-bar">' +
-            '<div class="bar-fill bar-a" style="width: ' + leftPct + '%"></div>' +
-            '<div class="bar-fill bar-b" style="width: ' + rightPct + '%"></div>' +
-            "</div>" +
-            '<div class="result-side-label right-label">' +
-            "<span>" + rightPct + "%</span>" +
-            "<strong>" + rightYear + "</strong>" +
-            "</div>" +
-            "</div>" +
-            '<p class="vote-count">' + results.total + " total vote" +
-            (results.total !== 1 ? "s" : "") + "</p>";
+            "<p><strong>&#10003; Thank you for voting!</strong></p>" +
+            "<p class=\"voted-subtext\">Results will be revealed by the admin after the round ends.</p>";
+
+        // Update columns: mark the voted year, remove the other button
+        buttons.forEach(function (b) {
+            if (parseInt(b.dataset.year) === votedYear) {
+                b.closest(".year-column").classList.add("selected");
+                b.disabled = true;
+                b.textContent = "Voted!";
+            } else {
+                b.remove();
+            }
+        });
     }
 });
