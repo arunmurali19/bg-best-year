@@ -80,7 +80,7 @@
     {% set t25 = top25_l + top25_r %}
     {% if t25 > 0 %}
     <div class="tier-bar-row">
-        <span class="tier-bar-label rank-gold">★ Top 25</span>
+        <span class="tier-bar-label rank-gold">Top 25</span>
         <span class="tier-bar-count count-left">{{ top25_l }}</span>
         <div class="tier-bar">
             <div class="tier-fill fill-left" style="width: {{ (top25_l / t25 * 100)|round(1) }}%"></div>
@@ -92,7 +92,7 @@
     {% set t200 = top200_l + top200_r %}
     {% if t200 > 0 %}
     <div class="tier-bar-row">
-        <span class="tier-bar-label rank-silver">● Top 200</span>
+        <span class="tier-bar-label rank-silver">Top 200</span>
         <span class="tier-bar-count count-left">{{ top200_l }}</span>
         <div class="tier-bar">
             <div class="tier-fill fill-left" style="width: {{ (top200_l / t200 * 100)|round(1) }}%"></div>
@@ -104,7 +104,7 @@
     {% set ttot = total_l + total_r %}
     {% if ttot > 0 %}
     <div class="tier-bar-row">
-        <span class="tier-bar-label rank-bronze">▲ Top 1000</span>
+        <span class="tier-bar-label rank-bronze">Top 1000</span>
         <span class="tier-bar-count count-left">{{ total_l }}</span>
         <div class="tier-bar">
             <div class="tier-fill fill-left" style="width: {{ (total_l / ttot * 100)|round(1) }}%"></div>
