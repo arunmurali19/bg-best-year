@@ -73,7 +73,7 @@
                 <h4 class="round-label">
                     {% set total_r1 = ns.round_matches[1]|length * 2 %}
                     {% set count = total_r1 // (2 ** (round_num - 1)) %}
-                    Round of {{ count }}
+                    {% if count == 8 %}Quarterfinals{% elif count == 4 %}Semifinals{% elif count == 2 %}Final{% else %}Round of {{ count }}{% endif %}
                 </h4>
                 <div class="round-matches">
                     {% for m in ns.round_matches.get(round_num, []) %}
