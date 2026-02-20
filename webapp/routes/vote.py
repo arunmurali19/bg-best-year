@@ -30,7 +30,7 @@ def index():
         winner=winner,
         voting_deadline=deadline,
     ))
-    resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax")
+    resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax", secure=True)
     return resp
 
 
@@ -66,7 +66,7 @@ def matchup(match_id):
         flip=flip,
         voting_deadline=deadline,
     ))
-    resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax")
+    resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax", secure=True)
     return resp
 
 
@@ -80,7 +80,7 @@ def submit_vote(match_id):
     result = voting.cast_vote(match_id, int(data["year"]), voter_id)
 
     resp = jsonify(result)
-    resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax")
+    resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax", secure=True)
     return resp
 
 
