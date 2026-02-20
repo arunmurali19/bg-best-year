@@ -127,18 +127,7 @@ def reset_tournament(secret):
     db.execute("UPDATE matches SET year_a = NULL, year_b = NULL WHERE round > 1")
     db.execute("UPDATE matches SET is_active = 1 WHERE round = 1")
     db.execute("UPDATE tournament_state SET value = '1' WHERE key = 'current_round'")
-
-    # Re-populate round 1 from tournament seed
-    from pathlib import Path
-    seed_path = Path(current_app.root_path).parent / "data" / "tournament_seed.json"
-    with open(seed_path) as f:
-        t = json.load(f)
-    for m in t["matches"]:
-        if m["round"] == 1:
-            db.execute(
-                "UPDATE matches SET year_a = ?, year_b = ? WHERE match_id = ?",
-                (m["year_a"], m["year_b"], m["match_id"])
-            )
-
+    db.execute("DELETE FROM tournament_state WHERE key = 'results_revealed'")
+    # Round 1 year_a/year_b stay in the DB — only rounds 2+ are cleared above
     db.commit()
     return redirect(url_for("admin.dashboard", secret=secret))
