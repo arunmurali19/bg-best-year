@@ -6,6 +6,16 @@ venv/
 .DS_Store
 .claude/
 
-# Large raw data file — not needed on server (DB is pre-built locally)
+# Data files — DB is pre-built; raw/internal data stays local only
 data/bgg_games.csv
 data/internal_analysis_top2000.csv
+data/internal_analysis.csv
+data/year_scores.json
+data/tournament_seed.json
+data/bgg_credit.jpg
+
+# Local-only directories
+data_pipeline/
+docs/
+scripts/
+run.md
