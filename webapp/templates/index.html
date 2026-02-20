@@ -27,14 +27,6 @@
 </div>
 {% endif %}
 
-{% if any_voted and not voter_finalized and not winner %}
-<form action="/finalize" method="post" class="finalise-form">
-    <button type="submit" class="finalise-btn">Finalise All Votes</button>
-</form>
-{% elif voter_finalized and not winner %}
-<p class="finalised-notice">&#10003; Your votes are finalised</p>
-{% endif %}
-
 {% if matchups %}
 <div class="matchup-grid">
     {% for m in matchups %}
