@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Bracket - Board Game Best Year{% endblock %}
+
+{% block content %}
+<h1>Tournament Bracket</h1>
+
+{% if winner %}
+<article class="champion-banner">
+    <h2>Champion: {{ winner.winner }}</h2>
+</article>
+{% endif %}
+
+{% set ns = namespace(round_matches={}) %}
+{% for m in matches %}
+    {% if m.round not in ns.round_matches %}
+        {% set _ = ns.round_matches.update({m.round: []}) %}
+    {% endif %}
+    {% set _ = ns.round_matches[m.round].append(m) %}
+{% endfor %}
+
+{% set num_rounds = ns.round_matches.keys()|list|sort|last %}
+{% set semi_round = num_rounds - 1 %}
+{% set all_semis = ns.round_matches.get(semi_round, []) %}
+{% set left_semi = all_semis[0] if all_semis else none %}
+{% set right_semi = all_semis[1] if all_semis|length > 1 else none %}
+{% set all_finals = ns.round_matches.get(num_rounds, []) %}
+{% set final_match = all_finals[0] if all_finals else none %}
+
+{# Macro to render a single match, with optional year flip and side indicator #}
+{% macro render_match(m, flip, side) %}
+{% set ns_m = namespace(top_year=m.year_a, bottom_year=m.year_b, top_votes=m.votes_a, bottom_votes=m.votes_b) %}
+{% if flip %}
+    {% set ns_m.top_year = m.year_b %}
+    {% set ns_m.bottom_year = m.year_a %}
+    {% set ns_m.top_votes = m.votes_b %}
+    {% set ns_m.bottom_votes = m.votes_a %}
+{% endif %}
+{% set total_v = (ns_m.top_votes or 0) + (ns_m.bottom_votes or 0) %}
+<div class="bracket-match {% if m.is_active and not m.winner %}active{% endif %} {% if m.winner %}completed{% endif %}"
+     data-match-id="{{ m.match_id }}"
+     data-next-match="{{ m.next_match_id or '' }}"
+     data-side="{{ side }}"
+     data-round="{{ m.round }}"
+     data-pos="{{ m.position }}">
+    <div class="bracket-team top {% if m.winner and m.winner == ns_m.top_year %}winner{% endif %}">
+        {% if ns_m.top_year %}
+            <a href="/matchup/{{ m.match_id }}">{{ ns_m.top_year }}</a>
+            {% if m.winner and total_v > 0 %}<span class="match-pct">{{ (ns_m.top_votes / total_v * 100)|round|int }}%</span>{% endif %}
+        {% else %}
+            <span class="tbd">TBD</span>
+        {% endif %}
+    </div>
+    <div class="bracket-team bottom {% if m.winner and m.winner == ns_m.bottom_year %}winner{% endif %}">
+        {% if ns_m.bottom_year %}
+            <a href="/matchup/{{ m.match_id }}">{{ ns_m.bottom_year }}</a>
+            {% if m.winner and total_v > 0 %}<span class="match-pct">{{ (ns_m.bottom_votes / total_v * 100)|round|int }}%</span>{% endif %}
+        {% else %}
+            <span class="tbd">TBD</span>
+        {% endif %}
+    </div>
+</div>
+{% endmacro %}
+
+<div class="bracket-container" id="bracket-container">
+    <div class="bracket-scroll" id="bracket-scroll">
+        <svg class="bracket-svg" id="bracket-svg"></svg>
+
+        <div class="bracket" data-num-rounds="{{ num_rounds }}">
+            {# === LEFT ROUNDS: Blue+Red section matches (positions 1-8 in R1), rounds 1 to semi_round-1 === #}
+            {% for round_num in range(1, semi_round) %}
+            <div class="bracket-round round-{{ round_num }}" data-round="{{ round_num }}">
+                <h4 class="round-label">
+                    {% set total_r1 = ns.round_matches[1]|length * 2 %}
+                    {% set count = total_r1 // (2 ** (round_num - 1)) %}
+                    Round of {{ count }}
+                </h4>
+                <div class="round-matches">
+                    {% for m in ns.round_matches.get(round_num, []) %}
+                        {% set sec = section_map.get(m.match_id, 'blue') %}
+                        {% if sec in ['blue', 'red'] %}
+                            {{ render_match(m, flip_map.get(m.match_id, False), 'left') }}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+
+            {# === LEFT SEMIFINAL === #}
+            <div class="bracket-round round-semi-left" data-round="{{ semi_round }}">
+                <h4 class="round-label">Semifinals</h4>
+                <div class="round-matches">
+                    {% if left_semi %}
+                        {{ render_match(left_semi, flip_map.get(left_semi.match_id, False), 'left') }}
+                    {% endif %}
+                </div>
+            </div>
+
+            {# === FINAL (center) === #}
+            <div class="bracket-round round-final" data-round="{{ num_rounds }}">
+                <h4 class="round-label">Final</h4>
+                <div class="round-matches">
+                    {% if final_match %}
+                        {{ render_match(final_match, flip_map.get(final_match.match_id, False), 'final') }}
+                    {% endif %}
+                </div>
+            </div>
+
+            {# === RIGHT SEMIFINAL === #}
+            <div class="bracket-round round-semi-right" data-round="{{ semi_round }}">
+                <h4 class="round-label">Semifinals</h4>
+                <div class="round-matches">
+                    {% if right_semi %}
+                        {{ render_match(right_semi, flip_map.get(right_semi.match_id, False), 'right') }}
+                    {% endif %}
+                </div>
+            </div>
+
+            {# === RIGHT ROUNDS: Yellow+Green section matches (positions 9-16 in R1), reversed order === #}
+            {% for round_num in range(semi_round - 1, 0, -1) %}
+            <div class="bracket-round round-{{ round_num }}-right" data-round="{{ round_num }}">
+                <h4 class="round-label">
+                    {% set total_r1 = ns.round_matches[1]|length * 2 %}
+                    {% set count = total_r1 // (2 ** (round_num - 1)) %}
+                    Round of {{ count }}
+                </h4>
+                <div class="round-matches">
+                    {% for m in ns.round_matches.get(round_num, []) %}
+                        {% set sec = section_map.get(m.match_id, 'yellow') %}
+                        {% if sec in ['yellow', 'green'] %}
+                            {{ render_match(m, flip_map.get(m.match_id, False), 'right') }}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/bracket.js') }}"></script>
+{% endblock %}

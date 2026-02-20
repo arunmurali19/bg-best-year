@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}{{ match.year_a }} vs {{ match.year_b }} - Board Game Best Year{% endblock %}
+
+{% block content %}
+<p><a href="/">&larr; Back to all matchups</a></p>
+
+{# Determine display order to match bracket view (odd match_ids flip year_b to left) #}
+{% if flip %}
+    {% set left_year = match.year_b %}
+    {% set right_year = match.year_a %}
+    {% set games_left = games_b %}
+    {% set games_right = games_a %}
+{% else %}
+    {% set left_year = match.year_a %}
+    {% set right_year = match.year_b %}
+    {% set games_left = games_a %}
+    {% set games_right = games_b %}
+{% endif %}
+
+<h2 class="matchup-title">{{ round_name }}: {{ left_year }} vs {{ right_year }}</h2>
+
+{% if results %}
+{% if flip %}
+{% set left_pct = results.pct_b %}
+{% set right_pct = results.pct_a %}
+{% else %}
+{% set left_pct = results.pct_a %}
+{% set right_pct = results.pct_b %}
+{% endif %}
+<div class="results-banner" id="results-banner">
+    <div class="result-row">
+        <div class="result-side-label">
+            <strong>{{ left_year }}</strong>
+            <span>{{ left_pct }}%</span>
+        </div>
+        <div class="result-bar">
+            <div class="bar-fill bar-a" style="width: {{ left_pct }}%"></div>
+            <div class="bar-fill bar-b" style="width: {{ right_pct }}%"></div>
+        </div>
+        <div class="result-side-label right-label">
+            <span>{{ right_pct }}%</span>
+            <strong>{{ right_year }}</strong>
+        </div>
+    </div>
+    <p class="vote-count">{{ results.total }} total vote{{ 's' if results.total != 1 }}</p>
+</div>
+{% endif %}
+
+<div class="matchup-columns" id="matchup-columns" data-flip="{{ 'true' if flip else 'false' }}">
+    {# Left column #}
+    <div class="year-column {% if user_voted == left_year %}selected{% endif %}">
+        <div class="year-header">
+            <h3>{{ left_year }}</h3>
+            {% if match.is_active and not match.winner and not user_voted %}
+            <button class="vote-btn" data-year="{{ left_year }}" data-match="{{ match.match_id }}">
+                Vote for {{ left_year }}
+            </button>
+            {% elif user_voted == left_year %}
+            <mark>Your vote</mark>
+            {% endif %}
+        </div>
+        {% set top25_left = games_left|selectattr('rank', 'le', 25)|list|length %}
+        {% set top200_left = games_left|selectattr('rank', 'le', 200)|list|length %}
+        <p class="game-count">
+            <span class="rank-gold">{{ top25_left }} in top 25</span> &middot;
+            <span class="rank-silver">{{ top200_left }} in top 200</span> &middot;
+            <span class="rank-bronze">{{ games_left|length }} in top 1000</span>
+        </p>
+        <div class="game-grid">
+            {% for g in games_left %}
+            <a href="https://boardgamegeek.com/boardgame/{{ g.game_id }}" target="_blank" class="game-tile">
+                <div class="game-thumb">
+                    {% if g.thumbnail_url %}
+                    <img src="{{ g.thumbnail_url }}" alt="{{ g.name }}" loading="lazy">
+                    {% endif %}
+                    <span class="rank-badge {% if g.rank <= 25 %}rank-gold{% elif g.rank <= 200 %}rank-silver{% else %}rank-bronze{% endif %}">#{{ g.rank }}</span>
+                </div>
+                <span class="game-name">{{ g.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="vs-divider">VS</div>
+
+    {# Right column #}
+    <div class="year-column {% if user_voted == right_year %}selected{% endif %}">
+        <div class="year-header">
+            <h3>{{ right_year }}</h3>
+            {% if match.is_active and not match.winner and not user_voted %}
+            <button class="vote-btn" data-year="{{ right_year }}" data-match="{{ match.match_id }}">
+                Vote for {{ right_year }}
+            </button>
+            {% elif user_voted == right_year %}
+            <mark>Your vote</mark>
+            {% endif %}
+        </div>
+        {% set top25_right = games_right|selectattr('rank', 'le', 25)|list|length %}
+        {% set top200_right = games_right|selectattr('rank', 'le', 200)|list|length %}
+        <p class="game-count">
+            <span class="rank-gold">{{ top25_right }} in top 25</span> &middot;
+            <span class="rank-silver">{{ top200_right }} in top 200</span> &middot;
+            <span class="rank-bronze">{{ games_right|length }} in top 1000</span>
+        </p>
+        <div class="game-grid">
+            {% for g in games_right %}
+            <a href="https://boardgamegeek.com/boardgame/{{ g.game_id }}" target="_blank" class="game-tile">
+                <div class="game-thumb">
+                    {% if g.thumbnail_url %}
+                    <img src="{{ g.thumbnail_url }}" alt="{{ g.name }}" loading="lazy">
+                    {% endif %}
+                    <span class="rank-badge {% if g.rank <= 25 %}rank-gold{% elif g.rank <= 200 %}rank-silver{% else %}rank-bronze{% endif %}">#{{ g.rank }}</span>
+                </div>
+                <span class="game-name">{{ g.name }}</span>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/vote.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Board Game Best Year{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <nav class="container">
+        <ul>
+            <li><strong><a href="/" class="nav-brand">Board Game Best Year</a></strong></li>
+        </ul>
+        <ul>
+            <li><a href="/">Vote</a></li>
+            <li><a href="/bracket">Bracket</a></li>
+            <li><a href="/results">Results</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="container">
+        <div class="site-footer">
+            <a href="https://www.boardgamegeek.com" target="_blank" rel="noopener">
+                <img src="{{ url_for('static', filename='img/bgg_credit.jpg') }}" alt="Powered by BoardGameGeek" class="bgg-badge">
+            </a>
+            <small>Rankings data sourced from <a href="https://www.boardgamegeek.com" target="_blank" rel="noopener">BoardGameGeek</a> top 1000.</small>
+        </div>
+    </footer>
+
+    {% block scripts %}{% endblock %}
+</body>
+</html>

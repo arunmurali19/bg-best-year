@@ -1,0 +1,362 @@
+[
+  {
+    "year": 2019,
+    "total_games": 150,
+    "top500_games": 37,
+    "score": 361
+  },
+  {
+    "year": 2017,
+    "total_games": 144,
+    "top500_games": 36,
+    "score": 333
+  },
+  {
+    "year": 2018,
+    "total_games": 134,
+    "top500_games": 37,
+    "score": 328
+  },
+  {
+    "year": 2022,
+    "total_games": 133,
+    "top500_games": 39,
+    "score": 327
+  },
+  {
+    "year": 2016,
+    "total_games": 116,
+    "top500_games": 33,
+    "score": 303
+  },
+  {
+    "year": 2021,
+    "total_games": 128,
+    "top500_games": 33,
+    "score": 296
+  },
+  {
+    "year": 2020,
+    "total_games": 118,
+    "top500_games": 36,
+    "score": 287
+  },
+  {
+    "year": 2015,
+    "total_games": 114,
+    "top500_games": 31,
+    "score": 286
+  },
+  {
+    "year": 2023,
+    "total_games": 100,
+    "top500_games": 23,
+    "score": 220
+  },
+  {
+    "year": 2014,
+    "total_games": 94,
+    "top500_games": 23,
+    "score": 216
+  },
+  {
+    "year": 2024,
+    "total_games": 89,
+    "top500_games": 18,
+    "score": 195
+  },
+  {
+    "year": 2011,
+    "total_games": 69,
+    "top500_games": 18,
+    "score": 179
+  },
+  {
+    "year": 2012,
+    "total_games": 71,
+    "top500_games": 20,
+    "score": 175
+  },
+  {
+    "year": 2013,
+    "total_games": 66,
+    "top500_games": 14,
+    "score": 147
+  },
+  {
+    "year": 2009,
+    "total_games": 48,
+    "top500_games": 14,
+    "score": 117
+  },
+  {
+    "year": 2010,
+    "total_games": 51,
+    "top500_games": 9,
+    "score": 104
+  },
+  {
+    "year": 2007,
+    "total_games": 34,
+    "top500_games": 10,
+    "score": 90
+  },
+  {
+    "year": 2005,
+    "total_games": 36,
+    "top500_games": 8,
+    "score": 85
+  },
+  {
+    "year": 2004,
+    "total_games": 36,
+    "top500_games": 8,
+    "score": 81
+  },
+  {
+    "year": 2008,
+    "total_games": 34,
+    "top500_games": 9,
+    "score": 71
+  },
+  {
+    "year": 2006,
+    "total_games": 23,
+    "top500_games": 8,
+    "score": 59
+  },
+  {
+    "year": 2025,
+    "total_games": 32,
+    "top500_games": 4,
+    "score": 58
+  },
+  {
+    "year": 1999,
+    "total_games": 17,
+    "top500_games": 7,
+    "score": 44
+  },
+  {
+    "year": 2000,
+    "total_games": 16,
+    "top500_games": 3,
+    "score": 31
+  },
+  {
+    "year": 2003,
+    "total_games": 18,
+    "top500_games": 1,
+    "score": 31
+  },
+  {
+    "year": 2002,
+    "total_games": 12,
+    "top500_games": 2,
+    "score": 27
+  },
+  {
+    "year": 1995,
+    "total_games": 13,
+    "top500_games": 1,
+    "score": 26
+  },
+  {
+    "year": 2001,
+    "total_games": 14,
+    "top500_games": 1,
+    "score": 19
+  },
+  {
+    "year": 1997,
+    "total_games": 9,
+    "top500_games": 2,
+    "score": 18
+  },
+  {
+    "year": 1998,
+    "total_games": 9,
+    "top500_games": 1,
+    "score": 14
+  },
+  {
+    "year": 1994,
+    "total_games": 7,
+    "top500_games": 0,
+    "score": 13
+  },
+  {
+    "year": 1986,
+    "total_games": 5,
+    "top500_games": 2,
+    "score": 11
+  },
+  {
+    "year": 1991,
+    "total_games": 3,
+    "top500_games": 1,
+    "score": 7
+  },
+  {
+    "year": 1992,
+    "total_games": 3,
+    "top500_games": 1,
+    "score": 7
+  },
+  {
+    "year": 1993,
+    "total_games": 3,
+    "top500_games": 1,
+    "score": 7
+  },
+  {
+    "year": 1996,
+    "total_games": 4,
+    "top500_games": 1,
+    "score": 7
+  },
+  {
+    "year": 1876,
+    "total_games": 1,
+    "top500_games": 1,
+    "score": 6
+  },
+  {
+    "year": 1980,
+    "total_games": 3,
+    "top500_games": 0,
+    "score": 6
+  },
+  {
+    "year": 1981,
+    "total_games": 2,
+    "top500_games": 1,
+    "score": 6
+  },
+  {
+    "year": 1989,
+    "total_games": 3,
+    "top500_games": 0,
+    "score": 6
+  },
+  {
+    "year": 1979,
+    "total_games": 3,
+    "top500_games": 0,
+    "score": 5
+  },
+  {
+    "year": 1982,
+    "total_games": 2,
+    "top500_games": 1,
+    "score": 5
+  },
+  {
+    "year": 1475,
+    "total_games": 1,
+    "top500_games": 1,
+    "score": 4
+  },
+  {
+    "year": 1963,
+    "total_games": 1,
+    "top500_games": 1,
+    "score": 4
+  },
+  {
+    "year": 1977,
+    "total_games": 3,
+    "top500_games": 0,
+    "score": 4
+  },
+  {
+    "year": 1985,
+    "total_games": 2,
+    "top500_games": 0,
+    "score": 4
+  },
+  {
+    "year": 1630,
+    "total_games": 1,
+    "top500_games": 0,
+    "score": 3
+  },
+  {
+    "year": 1983,
+    "total_games": 3,
+    "top500_games": 0,
+    "score": 3
+  },
+  {
+    "year": 1990,
+    "total_games": 2,
+    "top500_games": 0,
+    "score": 3
+  },
+  {
+    "year": 1800,
+    "total_games": 1,
+    "top500_games": 0,
+    "score": 2
+  },
+  {
+    "year": 1850,
+    "total_games": 1,
+    "top500_games": 0,
+    "score": 2
+  },
+  {
+    "year": 1959,
+    "total_games": 1,
+    "top500_games": 0,
+    "score": 2
+  },
+  {
+    "year": 1984,
+    "total_games": 1,
+    "top500_games": 0,
+    "score": 2
+  },
+  {
+    "year": 1988,
+    "total_games": 2,
+    "top500_games": 0,
+    "score": 2
+  },
+  {
+    "year": 1587,
+    "total_games": 1,
+    "top500_games": 0,
+    "score": 1
+  },
+  {
+    "year": 1810,
+    "total_games": 1,
+    "top500_games": 0,
+    "score": 1
+  },
+  {
+    "year": 1925,
+    "total_games": 1,
+    "top500_games": 0,
+    "score": 1
+  },
+  {
+    "year": 1960,
+    "total_games": 1,
+    "top500_games": 0,
+    "score": 1
+  },
+  {
+    "year": 1971,
+    "total_games": 1,
+    "top500_games": 0,
+    "score": 1
+  },
+  {
+    "year": 1987,
+    "total_games": 1,
+    "top500_games": 0,
+    "score": 1
+  }
+]

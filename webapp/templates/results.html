@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Board Game Best Year{% endblock %}
+
+{% block content %}
+<h1>Results</h1>
+
+{% if not rounds %}
+<p>No completed matches yet. <a href="/">Vote on the current matchups!</a></p>
+{% else %}
+{% for round_num in rounds.keys()|sort(reverse=true) %}
+<section>
+    <h2>{{ rounds[round_num].name }}</h2>
+    <div class="results-grid">
+    {% for m in rounds[round_num].matches %}
+        {% set total = m.votes_a + m.votes_b %}
+        {% set flip = m.round == 1 and m.match_id % 2 != 0 %}
+        {% set left_year   = m.year_b   if flip else m.year_a %}
+        {% set right_year  = m.year_a   if flip else m.year_b %}
+        {% set left_votes  = m.votes_b  if flip else m.votes_a %}
+        {% set right_votes = m.votes_a  if flip else m.votes_b %}
+        <a href="/matchup/{{ m.match_id }}" class="result-card-link">
+            <article class="result-card">
+                <div class="result-matchup">
+                    <span class="result-year {% if m.winner == left_year %}winner{% endif %}">
+                        {{ left_year }}
+                        <small>{% if total > 0 %}{{ (left_votes / total * 100)|round|int }}%{% else %}–{% endif %}</small>
+                    </span>
+                    <span class="vs">vs</span>
+                    <span class="result-year {% if m.winner == right_year %}winner{% endif %}">
+                        {{ right_year }}
+                        <small>{% if total > 0 %}{{ (right_votes / total * 100)|round|int }}%{% else %}–{% endif %}</small>
+                    </span>
+                </div>
+                {% if total > 0 %}
+                <div class="result-bar">
+                    <div class="bar-fill bar-a" style="width: {{ (left_votes / total * 100)|round(1) }}%"></div>
+                    <div class="bar-fill bar-b" style="width: {{ (right_votes / total * 100)|round(1) }}%"></div>
+                </div>
+                {% endif %}
+            </article>
+        </a>
+    {% endfor %}
+    </div>
+</section>
+{% endfor %}
+{% endif %}
+{% endblock %}

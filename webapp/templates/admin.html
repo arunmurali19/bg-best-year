@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Board Game Best Year{% endblock %}
+
+{% block content %}
+<h1>Admin Dashboard</h1>
+
+<article>
+    <h3>Tournament Status</h3>
+    <p><strong>Current Round:</strong> {{ current_round }} ({{ round_name }})</p>
+    <p><strong>Total Votes:</strong> {{ total_votes }} from {{ unique_voters }} unique voters</p>
+    {% if winner %}
+    <p><strong>Champion: {{ winner.winner }}</strong></p>
+    {% endif %}
+</article>
+
+<article>
+    <h3>Seedings</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Seed</th>
+                <th>Year</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for year, seed in year_seeds.items()|sort(attribute='1') %}
+            <tr>
+                <td>#{{ seed }}</td>
+                <td>{{ year }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</article>
+
+{% if active and not winner %}
+<article>
+    <h3>Active Matchups (Round {{ current_round }})</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Match</th>
+                <th>Year A</th>
+                <th>Year B</th>
+                <th>Votes A</th>
+                <th>Votes B</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in active %}
+            <tr>
+                <td>{{ m.match_id }}</td>
+                <td>{{ m.year_a }} <small>(#{{ year_seeds.get(m.year_a, '?') }})</small></td>
+                <td>{{ m.year_b }} <small>(#{{ year_seeds.get(m.year_b, '?') }})</small></td>
+                <td>{{ m.votes_a }}</td>
+                <td>{{ m.votes_b }}</td>
+                <td>{{ m.total_votes }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <form method="POST" action="/admin/{{ secret }}/advance"
+          onsubmit="return confirm('Close this round and advance winners?')">
+        <button type="submit" class="contrast">Advance to Next Round</button>
+    </form>
+</article>
+{% endif %}
+
+{% if completed %}
+<article>
+    <h3>Completed Matches</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Round</th>
+                <th>Year A</th>
+                <th>Year B</th>
+                <th>Votes</th>
+                <th>Winner</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in completed %}
+            <tr>
+                <td>{{ m.round }}</td>
+                <td>{{ m.year_a }} <small>(#{{ year_seeds.get(m.year_a, '?') }})</small></td>
+                <td>{{ m.year_b }} <small>(#{{ year_seeds.get(m.year_b, '?') }})</small></td>
+                <td>{{ m.votes_a }} - {{ m.votes_b }}</td>
+                <td><strong>{{ m.winner }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</article>
+{% endif %}
+
+<article>
+    <h3>Danger Zone</h3>
+    <form method="POST" action="/admin/{{ secret }}/reset"
+          onsubmit="return confirm('This will delete ALL votes and reset the tournament. Are you sure?')">
+        <button type="submit" class="outline secondary">Reset Entire Tournament</button>
+    </form>
+</article>
+{% endblock %}

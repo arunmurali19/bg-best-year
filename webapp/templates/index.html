@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Vote - Board Game Best Year{% endblock %}
+
+{% block content %}
+{% if winner %}
+<article class="champion-banner">
+    <h1>Champion: {{ winner.winner }}</h1>
+    <p>The tournament is complete! <strong>{{ winner.winner }}</strong> has been crowned the best year for board games.</p>
+    <p><a href="/bracket">View the full bracket</a> | <a href="/results">View all results</a></p>
+</article>
+{% else %}
+<hgroup>
+    <h1>{{ round_name }}</h1>
+    <p>Vote for the best year in board gaming! Pick one year from each matchup.</p>
+</hgroup>
+
+{% if matchups %}
+<div class="matchup-grid">
+    {% for m in matchups %}
+    <article class="matchup-card">
+        <a href="/matchup/{{ m.match_id }}">
+            <div class="matchup-versus">
+                <span class="year-label {% if m.user_voted == m.year_a %}voted{% endif %}">{{ m.year_a }}</span>
+                <span class="vs">vs</span>
+                <span class="year-label {% if m.user_voted == m.year_b %}voted{% endif %}">{{ m.year_b }}</span>
+            </div>
+            {% if m.user_voted %}
+            <div class="vote-status">
+                <small>You voted for {{ m.user_voted }}</small>
+                <div class="result-bar-mini">
+                    <div class="bar-a" style="width: {{ m.results.pct_a }}%"></div>
+                </div>
+                <small>{{ m.results.votes_a }} - {{ m.results.votes_b }}</small>
+            </div>
+            {% else %}
+            <small class="vote-cta">Click to vote</small>
+            {% endif %}
+        </a>
+    </article>
+    {% endfor %}
+</div>
+{% else %}
+<p>No active matchups right now. Check back later!</p>
+{% endif %}
+{% endif %}
+{% endblock %}
