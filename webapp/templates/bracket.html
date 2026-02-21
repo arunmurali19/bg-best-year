@@ -4,7 +4,6 @@
 
 {% block content %}
 <h1>Tournament Bracket</h1>
-<div class="mobile-back-bar"><a href="/">&larr; Vote</a></div>
 
 {% if winner %}
 <article class="champion-banner">
@@ -144,4 +143,8 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/bracket.js') }}"></script>
+{% endblock %}
+
+{% block body_end %}
+<div class="mobile-back-bar"><a href="/">&larr; Vote</a></div>
 {% endblock %}
