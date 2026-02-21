@@ -68,7 +68,7 @@
 }
 
 .year-label.voted {
-    color: var(--accent);
+    color: #27ae60;
 }
 
 .vs {
@@ -193,8 +193,8 @@
 }
 
 .year-column.selected {
-    border-color: var(--accent);
-    background: rgba(230, 126, 34, 0.05);
+    border-color: #27ae60;
+    background: rgba(39, 174, 96, 0.05);
 }
 
 .year-header {
@@ -718,4 +718,13 @@
 .champion-banner a {
     color: white;
     text-decoration: underline;
+}
+
+/* User's pick indicator in bracket */
+.my-pick-label {
+    font-size: 0.72rem;
+    color: #27ae60;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-right: 3px;
 }

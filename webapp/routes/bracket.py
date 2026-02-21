@@ -1,7 +1,7 @@
 """Bracket display routes."""
 
-from flask import Blueprint, render_template, jsonify
-from webapp.services import tournament
+from flask import Blueprint, render_template, jsonify, make_response
+from webapp.services import tournament, voting
 
 bracket_bp = Blueprint("bracket", __name__)
 
@@ -45,14 +45,25 @@ def bracket_page():
     # next match, so showing year_a on top preserves correct bracket progression.
     flip_map = {m["match_id"]: (m["round"] == 1 and m["match_id"] % 2 != 0) for m in matches}
 
-    return render_template(
+    # Look up this user's picks for all matches
+    voter_id = voting.get_or_create_voter_id()
+    user_votes = {}
+    for m in matches:
+        pick = voting.has_voted(m["match_id"], voter_id)
+        if pick:
+            user_votes[m["match_id"]] = pick
+
+    resp = make_response(render_template(
         "bracket.html",
         matches=matches,
         current_round=current_round,
         winner=winner,
         section_map=section_map,
         flip_map=flip_map,
-    )
+        user_votes=user_votes,
+    ))
+    resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax", secure=True)
+    return resp
 
 
 @bracket_bp.route("/bracket/data")

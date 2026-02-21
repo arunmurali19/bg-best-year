@@ -28,7 +28,7 @@
 {% set final_match = all_finals[0] if all_finals else none %}
 
 {# Macro to render a single match, with optional year flip and side indicator #}
-{% macro render_match(m, flip, side) %}
+{% macro render_match(m, flip, side, user_pick=none) %}
 {% set ns_m = namespace(top_year=m.year_a, bottom_year=m.year_b, top_votes=m.votes_a, bottom_votes=m.votes_b) %}
 {% if flip %}
     {% set ns_m.top_year = m.year_b %}
@@ -45,6 +45,7 @@
      data-pos="{{ m.position }}">
     <div class="bracket-team top {% if m.winner and m.winner == ns_m.top_year %}winner{% endif %}">
         {% if ns_m.top_year %}
+            {% if user_pick and user_pick == ns_m.top_year %}<span class="my-pick-label">(V)</span>{% endif %}
             <a href="/matchup/{{ m.match_id }}">{{ ns_m.top_year }}</a>
             {% if m.winner and total_v > 0 %}<span class="match-pct">{{ (ns_m.top_votes / total_v * 100)|round|int }}%</span>{% endif %}
         {% else %}
@@ -53,6 +54,7 @@
     </div>
     <div class="bracket-team bottom {% if m.winner and m.winner == ns_m.bottom_year %}winner{% endif %}">
         {% if ns_m.bottom_year %}
+            {% if user_pick and user_pick == ns_m.bottom_year %}<span class="my-pick-label">(V)</span>{% endif %}
             <a href="/matchup/{{ m.match_id }}">{{ ns_m.bottom_year }}</a>
             {% if m.winner and total_v > 0 %}<span class="match-pct">{{ (ns_m.bottom_votes / total_v * 100)|round|int }}%</span>{% endif %}
         {% else %}
@@ -79,7 +81,7 @@
                     {% for m in ns.round_matches.get(round_num, []) %}
                         {% set sec = section_map.get(m.match_id, 'blue') %}
                         {% if sec in ['blue', 'red'] %}
-                            {{ render_match(m, flip_map.get(m.match_id, False), 'left') }}
+                            {{ render_match(m, flip_map.get(m.match_id, False), 'left', user_votes.get(m.match_id)) }}
                         {% endif %}
                     {% endfor %}
                 </div>
@@ -91,7 +93,7 @@
                 <h4 class="round-label">Semifinals</h4>
                 <div class="round-matches">
                     {% if left_semi %}
-                        {{ render_match(left_semi, flip_map.get(left_semi.match_id, False), 'left') }}
+                        {{ render_match(left_semi, flip_map.get(left_semi.match_id, False), 'left', user_votes.get(left_semi.match_id)) }}
                     {% endif %}
                 </div>
             </div>
@@ -101,7 +103,7 @@
                 <h4 class="round-label">Final</h4>
                 <div class="round-matches">
                     {% if final_match %}
-                        {{ render_match(final_match, flip_map.get(final_match.match_id, False), 'final') }}
+                        {{ render_match(final_match, flip_map.get(final_match.match_id, False), 'final', user_votes.get(final_match.match_id)) }}
                     {% endif %}
                 </div>
             </div>
@@ -111,7 +113,7 @@
                 <h4 class="round-label">Semifinals</h4>
                 <div class="round-matches">
                     {% if right_semi %}
-                        {{ render_match(right_semi, flip_map.get(right_semi.match_id, False), 'right') }}
+                        {{ render_match(right_semi, flip_map.get(right_semi.match_id, False), 'right', user_votes.get(right_semi.match_id)) }}
                     {% endif %}
                 </div>
             </div>
@@ -128,7 +130,7 @@
                     {% for m in ns.round_matches.get(round_num, []) %}
                         {% set sec = section_map.get(m.match_id, 'yellow') %}
                         {% if sec in ['yellow', 'green'] %}
-                            {{ render_match(m, flip_map.get(m.match_id, False), 'right') }}
+                            {{ render_match(m, flip_map.get(m.match_id, False), 'right', user_votes.get(m.match_id)) }}
                         {% endif %}
                     {% endfor %}
                 </div>
