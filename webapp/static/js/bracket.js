@@ -20,14 +20,24 @@ document.addEventListener("DOMContentLoaded", function () {
         var bar = document.querySelector(".mobile-back-bar");
         if (!bar || !window.visualViewport) return;
         var vv    = window.visualViewport;
+        var s     = vv.scale || 1;          // pinch-zoom factor (1 = no zoom)
+        var barW  = bar.offsetWidth  || 120;
         var barH  = bar.offsetHeight || 44;
         // pageLeft/pageTop = visual viewport origin in document coordinates
         var pageLeft = vv.pageLeft !== undefined ? vv.pageLeft : (window.scrollX + vv.offsetLeft);
         var pageTop  = vv.pageTop  !== undefined ? vv.pageTop  : (window.scrollY + vv.offsetTop);
-        bar.style.position = "absolute";
-        bar.style.bottom   = "auto";
-        bar.style.left     = Math.round(pageLeft + vv.width / 2) + "px";
-        bar.style.top      = Math.round(pageTop  + vv.height - barH - 19) + "px";
+
+        // Scale the element down by 1/s so it keeps the same visual size at any zoom.
+        // With transform-origin: left top the left/top edges stay at the CSS pixel
+        // positions we set, and the element shrinks inward/downward.
+        bar.style.position        = "absolute";
+        bar.style.bottom          = "auto";
+        bar.style.transformOrigin = "left top";
+        bar.style.transform       = "scale(" + (1 / s) + ")";
+        // Centre horizontally: left edge = viewport_centre - half_scaled_width
+        bar.style.left = Math.round(pageLeft + vv.width / 2 - barW / (2 * s)) + "px";
+        // Pin bottom edge 19 CSS-px above the visual viewport bottom
+        bar.style.top  = Math.round(pageTop + vv.height - barH / s - 19) + "px";
     }
 
     if (window.visualViewport) {
