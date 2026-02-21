@@ -70,6 +70,7 @@ def dashboard(secret):
         completed_by_round[r]["matches"].append(m)
 
     deadline = tournament.get_voting_deadline() or ""
+    wave_info = tournament.get_wave_info()
 
     return render_template(
         "admin.html",
@@ -85,6 +86,7 @@ def dashboard(secret):
         year_seeds=year_seeds,
         revealed_rounds=revealed_rounds,
         deadline=deadline,
+        wave_info=wave_info,
     )
 
 
@@ -122,10 +124,14 @@ def reset_tournament(secret):
         return "Unauthorized", 403
 
     db = get_db()
+    db.execute("DELETE FROM voter_finalizations")
     db.execute("DELETE FROM votes")
     db.execute("UPDATE matches SET winner = NULL, is_active = 0")
     db.execute("UPDATE matches SET year_a = NULL, year_b = NULL WHERE round > 1")
-    db.execute("UPDATE matches SET is_active = 1 WHERE round = 1")
+    db.execute(
+        "UPDATE matches SET is_active = 1 WHERE round = 1 AND match_id IN "
+        "(SELECT match_id FROM matches WHERE round = 1 ORDER BY position LIMIT 4)"
+    )
     db.execute("UPDATE tournament_state SET value = '1' WHERE key = 'current_round'")
     db.execute("DELETE FROM tournament_state WHERE key = 'results_revealed'")
     # Round 1 year_a/year_b stay in the DB — only rounds 2+ are cleared above

@@ -12,6 +12,9 @@
 {% else %}
 <hgroup>
     <h1>{{ round_name }}</h1>
+    {% if wave_info %}
+    <p class="wave-indicator">Wave {{ wave_info[0] }} of {{ wave_info[1] }}</p>
+    {% endif %}
     {% if voter_finalized %}
     <p>Your votes are locked in. Results will be revealed after the round ends.</p>
     {% elif all_voted %}

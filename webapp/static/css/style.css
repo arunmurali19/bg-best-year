@@ -596,6 +596,16 @@
     opacity: 0.6;
 }
 
+/* Wave indicator on index page */
+.wave-indicator {
+    font-size: 0.9rem;
+    font-weight: 600;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin: 0;
+}
+
 /* Voting deadline countdown timer */
 .deadline-timer {
     text-align: center;

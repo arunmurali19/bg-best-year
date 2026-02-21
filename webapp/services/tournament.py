@@ -92,7 +92,11 @@ def get_all_years():
 
 
 def advance_round():
-    """Tally votes for active matches, set winners, advance to next round."""
+    """Tally votes for active matches, set winners.
+
+    Wave-aware: if the current round has >4 matches and unactivated ones remain,
+    activates the next batch of 4 instead of jumping to the next round.
+    """
     db = get_db()
     current_round = get_current_round()
 
@@ -150,23 +154,64 @@ def advance_round():
             "winner": winner,
         })
 
-    # Activate next round
-    next_round = current_round + 1
-    next_matches = db.execute(
-        "SELECT COUNT(*) as c FROM matches WHERE round = ?", (next_round,)
-    ).fetchone()["c"]
+    # Check for remaining unactivated matches in the current round
+    pending = db.execute(
+        "SELECT match_id FROM matches WHERE round = ? AND is_active = 0 AND winner IS NULL "
+        "ORDER BY position",
+        (current_round,)
+    ).fetchall()
 
-    if next_matches > 0:
-        db.execute(
-            "UPDATE matches SET is_active = 1 WHERE round = ?", (next_round,)
-        )
-        db.execute(
-            "UPDATE tournament_state SET value = ? WHERE key = 'current_round'",
-            (str(next_round),)
-        )
+    if pending:
+        # More waves left in this round — activate next batch of up to 4
+        for row in pending[:4]:
+            db.execute(
+                "UPDATE matches SET is_active = 1 WHERE match_id = ?", (row["match_id"],)
+            )
+        next_round = current_round
+    else:
+        # All matches in this round done — advance to next round
+        next_round = current_round + 1
+        next_matches = db.execute(
+            "SELECT match_id FROM matches WHERE round = ? ORDER BY position", (next_round,)
+        ).fetchall()
+        if next_matches:
+            if len(next_matches) > 4:
+                # Large round: start with first wave of 4
+                for row in next_matches[:4]:
+                    db.execute(
+                        "UPDATE matches SET is_active = 1 WHERE match_id = ?", (row["match_id"],)
+                    )
+            else:
+                # Small round (QF/SF/Final): activate all at once
+                db.execute(
+                    "UPDATE matches SET is_active = 1 WHERE round = ?", (next_round,)
+                )
+            db.execute(
+                "UPDATE tournament_state SET value = ? WHERE key = 'current_round'",
+                (str(next_round),)
+            )
 
     db.commit()
     return {"advanced": len(results), "results": results, "next_round": next_round}
+
+
+def get_wave_info():
+    """Returns (current_wave, total_waves) if the current round uses wave mode, else None.
+
+    Wave mode applies when a round has more than 4 matches.
+    """
+    db = get_db()
+    current_round = get_current_round()
+    total = db.execute(
+        "SELECT COUNT(*) as c FROM matches WHERE round = ?", (current_round,)
+    ).fetchone()["c"]
+    if total <= 4:
+        return None
+    completed = db.execute(
+        "SELECT COUNT(*) as c FROM matches WHERE round = ? AND winner IS NOT NULL",
+        (current_round,)
+    ).fetchone()["c"]
+    return ((completed // 4) + 1, total // 4)
 
 
 def get_completed_matches(round_num=None):

@@ -36,7 +36,7 @@
 
 {% if active and not winner %}
 <article>
-    <h3>Active Matchups (Round {{ current_round }})</h3>
+    <h3>Active Matchups (Round {{ current_round }}{% if wave_info %} — Wave {{ wave_info[0] }} of {{ wave_info[1] }}{% endif %})</h3>
     <table>
         <thead>
             <tr>
@@ -63,8 +63,14 @@
     </table>
 
     <form method="POST" action="/admin/{{ secret }}/advance"
-          onsubmit="return confirm('Close this round and advance winners?')">
-        <button type="submit" class="contrast">Advance to Next Round</button>
+          onsubmit="return confirm('Close this wave and advance winners?')">
+        <button type="submit" class="contrast">
+            {% if wave_info %}
+            Advance Wave {{ wave_info[0] }} of {{ wave_info[1] }}
+            {% else %}
+            Advance to Next Round
+            {% endif %}
+        </button>
     </form>
 </article>
 {% endif %}

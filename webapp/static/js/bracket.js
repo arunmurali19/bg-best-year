@@ -184,8 +184,8 @@ function drawBracketLines() {
             " H " + dstX
         );
         path.setAttribute("fill",         "none");
-        path.setAttribute("stroke",       "#b0b0b0");
-        path.setAttribute("stroke-width", "1.5");
+        path.setAttribute("stroke",       "#666666");
+        path.setAttribute("stroke-width", "2");
         svg.appendChild(path);
     });
 }

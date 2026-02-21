@@ -10,6 +10,7 @@ venv/
 data/bgg_games.csv
 data/internal_analysis_top2000.csv
 data/internal_analysis.csv
+data/internal_analysis.xlsx
 data/year_scores.json
 data/tournament_seed.json
 data/bgg_credit.jpg

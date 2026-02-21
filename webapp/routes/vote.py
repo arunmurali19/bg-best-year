@@ -17,6 +17,7 @@ def index():
 
     voter_id = voting.get_or_create_voter_id()
     voter_finalized = voting.is_voter_finalized(voter_id)
+    wave_info = tournament.get_wave_info()
 
     all_voted = bool(matchups)
     for m in matchups:
@@ -35,6 +36,7 @@ def index():
         voting_deadline=deadline,
         voter_finalized=voter_finalized,
         all_voted=all_voted,
+        wave_info=wave_info,
     ))
     resp.set_cookie("voter_id", voter_id, max_age=365 * 24 * 3600, samesite="Lax", secure=True)
     return resp
