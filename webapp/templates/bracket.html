@@ -45,8 +45,8 @@
      data-pos="{{ m.position }}">
     <div class="bracket-team top {% if m.winner and m.winner == ns_m.top_year %}winner{% endif %}">
         {% if ns_m.top_year %}
-            {% if user_pick and user_pick == ns_m.top_year %}<span class="my-pick-label">(V)</span>{% endif %}
             <a href="/matchup/{{ m.match_id }}">{{ ns_m.top_year }}</a>
+            {% if user_pick and user_pick == ns_m.top_year %}<span class="my-pick-label">(V)</span>{% endif %}
             {% if m.winner and total_v > 0 %}<span class="match-pct">{{ (ns_m.top_votes / total_v * 100)|round|int }}%</span>{% endif %}
         {% else %}
             <span class="tbd">TBD</span>
@@ -54,8 +54,8 @@
     </div>
     <div class="bracket-team bottom {% if m.winner and m.winner == ns_m.bottom_year %}winner{% endif %}">
         {% if ns_m.bottom_year %}
-            {% if user_pick and user_pick == ns_m.bottom_year %}<span class="my-pick-label">(V)</span>{% endif %}
             <a href="/matchup/{{ m.match_id }}">{{ ns_m.bottom_year }}</a>
+            {% if user_pick and user_pick == ns_m.bottom_year %}<span class="my-pick-label">(V)</span>{% endif %}
             {% if m.winner and total_v > 0 %}<span class="match-pct">{{ (ns_m.bottom_votes / total_v * 100)|round|int }}%</span>{% endif %}
         {% else %}
             <span class="tbd">TBD</span>
