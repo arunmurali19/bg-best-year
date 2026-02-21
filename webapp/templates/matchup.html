@@ -3,7 +3,8 @@
 {% block title %}{{ match.year_a }} vs {{ match.year_b }} - What's the Good Year?{% endblock %}
 
 {% block content %}
-<p><a href="/">&larr; Back to all matchups</a></p>
+<p class="matchup-back-link"><a href="/">&larr; Back to all matchups</a></p>
+<div class="mobile-back-bar"><a href="/">&larr; All matchups</a></div>
 
 {# Determine display order to match bracket view (odd match_ids flip year_b to left) #}
 {% if flip %}

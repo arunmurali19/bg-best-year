@@ -728,3 +728,40 @@
     flex-shrink: 0;
     margin-left: 3px;
 }
+
+.my-pick-label.pick-lost {
+    color: #e74c3c;
+}
+
+/* Mobile floating back button on matchup page */
+.mobile-back-bar {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .matchup-back-link {
+        display: none;
+    }
+
+    .mobile-back-bar {
+        display: block;
+        position: fixed;
+        bottom: 1.2rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        border: 1px solid #d0d0d0;
+        border-radius: 24px;
+        padding: 0.55rem 1.4rem;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        z-index: 100;
+        font-size: 0.9rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .mobile-back-bar a {
+        text-decoration: none;
+        color: var(--accent);
+    }
+}
