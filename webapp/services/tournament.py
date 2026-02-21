@@ -214,6 +214,57 @@ def get_wave_info():
     return ((completed // 4) + 1, total // 4)
 
 
+def reset_current_wave():
+    """Clear votes for the currently active (no-winner) matches so the wave can be re-voted."""
+    db = get_db()
+    current_round = get_current_round()
+    active = db.execute(
+        "SELECT match_id FROM matches WHERE round = ? AND is_active = 1 AND winner IS NULL",
+        (current_round,)
+    ).fetchall()
+    for row in active:
+        db.execute("DELETE FROM votes WHERE match_id = ?", (row["match_id"],))
+    db.commit()
+    return {"cleared_matches": len(active)}
+
+
+def reset_current_round():
+    """Roll back the entire current round: clear all its votes, re-open first wave.
+
+    Also NULLs out the year slots in the next round that were populated by this
+    round's (now-cancelled) winners.
+    """
+    db = get_db()
+    current_round = get_current_round()
+
+    # Clear votes and reset all matches in this round
+    for row in db.execute(
+        "SELECT match_id FROM matches WHERE round = ?", (current_round,)
+    ).fetchall():
+        db.execute("DELETE FROM votes WHERE match_id = ?", (row["match_id"],))
+    db.execute(
+        "UPDATE matches SET winner = NULL, is_active = 0 WHERE round = ?",
+        (current_round,)
+    )
+
+    # NULL out year slots that were filled in the next round by this round's winners
+    db.execute(
+        "UPDATE matches SET year_a = NULL, year_b = NULL WHERE round = ?",
+        (current_round + 1,)
+    )
+
+    # Re-activate first wave of this round
+    first_wave = db.execute(
+        "SELECT match_id FROM matches WHERE round = ? ORDER BY position LIMIT 4",
+        (current_round,)
+    ).fetchall()
+    for row in first_wave:
+        db.execute("UPDATE matches SET is_active = 1 WHERE match_id = ?", (row["match_id"],))
+
+    db.commit()
+    return {"round_reset": current_round}
+
+
 def get_completed_matches(round_num=None):
     db = get_db()
     if round_num:

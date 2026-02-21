@@ -118,6 +118,22 @@ def set_deadline(secret):
     return redirect(url_for("admin.dashboard", secret=secret))
 
 
+@admin_bp.route("/admin/<secret>/reset_wave", methods=["POST"])
+def reset_wave(secret):
+    if not check_secret(secret):
+        return "Unauthorized", 403
+    tournament.reset_current_wave()
+    return redirect(url_for("admin.dashboard", secret=secret))
+
+
+@admin_bp.route("/admin/<secret>/reset_round", methods=["POST"])
+def reset_round(secret):
+    if not check_secret(secret):
+        return "Unauthorized", 403
+    tournament.reset_current_round()
+    return redirect(url_for("admin.dashboard", secret=secret))
+
+
 @admin_bp.route("/admin/<secret>/reset", methods=["POST"])
 def reset_tournament(secret):
     if not check_secret(secret):

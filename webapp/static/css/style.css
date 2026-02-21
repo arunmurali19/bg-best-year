@@ -31,6 +31,14 @@
     color: var(--accent) !important;
 }
 
+.site-tagline {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 400;
+    opacity: 0.55;
+    margin-top: 1px;
+}
+
 /* Matchup Grid (index page) */
 .matchup-grid {
     display: grid;

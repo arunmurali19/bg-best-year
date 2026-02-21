@@ -62,16 +62,26 @@
         </tbody>
     </table>
 
-    <form method="POST" action="/admin/{{ secret }}/advance"
-          onsubmit="return confirm('Close this wave and advance winners?')">
-        <button type="submit" class="contrast">
-            {% if wave_info %}
-            Advance Wave {{ wave_info[0] }} of {{ wave_info[1] }}
-            {% else %}
-            Advance to Next Round
-            {% endif %}
-        </button>
-    </form>
+    <div style="display:flex; gap:1rem; flex-wrap:wrap; margin-top:1rem;">
+        <form method="POST" action="/admin/{{ secret }}/advance"
+              onsubmit="return confirm('Close this wave and advance winners?')">
+            <button type="submit" class="contrast">
+                {% if wave_info %}
+                Advance Wave {{ wave_info[0] }} of {{ wave_info[1] }}
+                {% else %}
+                Advance to Next Round
+                {% endif %}
+            </button>
+        </form>
+        <form method="POST" action="/admin/{{ secret }}/reset_wave"
+              onsubmit="return confirm('Clear all votes for the current wave so people can re-vote? Winners already set are kept.')">
+            <button type="submit" class="outline secondary">Reset Wave Votes</button>
+        </form>
+        <form method="POST" action="/admin/{{ secret }}/reset_round"
+              onsubmit="return confirm('Roll back the entire current round? This clears all its votes and re-opens Wave 1.')">
+            <button type="submit" class="outline secondary">Reset Round</button>
+        </form>
+    </div>
 </article>
 {% endif %}
 
