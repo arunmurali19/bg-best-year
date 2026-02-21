@@ -11,6 +11,24 @@ document.addEventListener("DOMContentLoaded", function () {
         fitBracket();
         drawBracketLines();
     });
+
+    // Keep the mobile back bar pinned to the bottom of the VISUAL viewport
+    // (position:fixed tracks the layout viewport; pinch-zoom moves the visual
+    //  viewport within it, so we need the visualViewport API to compensate).
+    function repositionMobileBar() {
+        var bar = document.querySelector(".mobile-back-bar");
+        if (!bar || !window.visualViewport) return;
+        var vv = window.visualViewport;
+        var distFromBottom = window.innerHeight - (vv.offsetTop + vv.height);
+        bar.style.bottom = Math.max(0, distFromBottom + 19) + "px";
+        bar.style.left   = (vv.offsetLeft + vv.width / 2) + "px";
+    }
+
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener("resize", repositionMobileBar);
+        window.visualViewport.addEventListener("scroll", repositionMobileBar);
+        repositionMobileBar();
+    }
 });
 
 /**
