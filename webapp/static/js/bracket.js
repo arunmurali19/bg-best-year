@@ -12,21 +12,28 @@ document.addEventListener("DOMContentLoaded", function () {
         drawBracketLines();
     });
 
-    // Keep the mobile back bar pinned to the bottom of the VISUAL viewport
-    // (position:fixed tracks the layout viewport; pinch-zoom moves the visual
-    //  viewport within it, so we need the visualViewport API to compensate).
+    // Keep the mobile back bar pinned to the bottom of the VISUAL viewport.
+    // position:fixed is relative to the layout viewport and disappears when the
+    // user pinch-zooms. Switching to position:absolute lets us place the element
+    // at exact document-coordinate offsets derived from the visualViewport API.
     function repositionMobileBar() {
         var bar = document.querySelector(".mobile-back-bar");
         if (!bar || !window.visualViewport) return;
-        var vv = window.visualViewport;
-        var distFromBottom = window.innerHeight - (vv.offsetTop + vv.height);
-        bar.style.bottom = Math.max(0, distFromBottom + 19) + "px";
-        bar.style.left   = (vv.offsetLeft + vv.width / 2) + "px";
+        var vv    = window.visualViewport;
+        var barH  = bar.offsetHeight || 44;
+        // pageLeft/pageTop = visual viewport origin in document coordinates
+        var pageLeft = vv.pageLeft !== undefined ? vv.pageLeft : (window.scrollX + vv.offsetLeft);
+        var pageTop  = vv.pageTop  !== undefined ? vv.pageTop  : (window.scrollY + vv.offsetTop);
+        bar.style.position = "absolute";
+        bar.style.bottom   = "auto";
+        bar.style.left     = Math.round(pageLeft + vv.width / 2) + "px";
+        bar.style.top      = Math.round(pageTop  + vv.height - barH - 19) + "px";
     }
 
     if (window.visualViewport) {
         window.visualViewport.addEventListener("resize", repositionMobileBar);
         window.visualViewport.addEventListener("scroll", repositionMobileBar);
+        window.addEventListener("scroll", repositionMobileBar);
         repositionMobileBar();
     }
 });
